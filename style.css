@@ -1,0 +1,144 @@
+
+#stories{
+    margin-top: 50px;
+}
+.stories-container{
+    display: flex;
+}
+.story-col {
+    flex: 1;
+    margin-left: 15px;
+}
+.story-col:last-child{
+    margin-left: 0px;
+}
+.story {
+    border-radius: 16px;
+    height: 252px;
+    background-size: cover;
+    background-position: center;
+    padding: 5px;
+    cursor: pointer;
+}
+.story-borderd {
+    border: 1px solid rgb(255 255 255 / 0.5);
+    border-radius: 14px;
+    height: 100%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+    flex-direction: column;
+    padding: 8px;
+}
+.story-image{
+    border-radius: 50%;
+    height: 36px;
+    width: 36px;
+    border: 2px solid #FFFFFF;
+}
+.story-title{
+    font-weight: bold;
+    font-size: 16px;
+    line-height: 24px;
+    color: #FFFFFF;
+}
+#story-items{
+    display: none;
+    position: fixed;
+    top: 0;
+    height: 100%;
+    background: rgb(0 0 0 / 0.85);
+    width: 100%;
+}
+.story-items {
+    text-align: center;
+    display: flex;
+    padding: 24px;
+    height: 100%;
+}
+.story-item {
+    margin: 60px 0;
+    display: flex;
+    width: 100%;
+    justify-content: center;
+}
+.story-item-background {
+    flex: 0 0 384px;
+    flex-direction: column;
+    width: 384px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    display: flex;
+}
+.story-item-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+.story-item-title{
+    font-weight: bold;
+    font-size: 36px;
+    line-height: 44px;
+    color: #FFFFFF;
+    text-align: right;
+    align-self: flex-end;
+    margin-bottom: 55px;
+}
+.story-item-more-link {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #CF0B10;
+    padding: 7px 15px 7px;
+}
+.story-item-more-link a{
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 20px;
+}
+.story-info {
+    display: flex;
+    margin: 16px;
+}
+.story-info-image{
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+}
+.story-item-content {
+    align-self: flex-end;
+    margin: 0 16px;
+}
+.story-info-title {
+    font-weight: bold;
+    font-size: 20px;
+    line-height: 28px;
+    color: #ffffff;
+    align-self: center;
+    margin: 0 16px;
+}
+.story-prev,.story-next{
+    cursor: pointer;
+    align-self: center;
+    margin: 60px;
+}
+.story-timeline {
+    display: flex;
+}
+.story-timeline span {
+    background: #696969;
+    opacity: 0.6;
+    border-radius: 2px;
+    flex: 1;
+    margin: 3px;
+    height: 4px;
+    display: flex;
+}
+.story-timeline span.active{
+    background: #CF0B10;
+}
