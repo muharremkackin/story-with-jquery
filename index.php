@@ -82,6 +82,8 @@ $data = [
                 </div>
 
                 <div class="story-item-background" style="background-image:url('./images/1.jpg')">
+                    <div class="story-video-container"></div>
+
                     <div class="story-timeline">
                     </div>
                     <div class="story-item-container">
@@ -107,6 +109,10 @@ $data = [
         </div>
     </div>
     <script>
+        var start_time_ms = 0;
+        var story_timer_step = 30000;
+        var story_timer_handle;
+        var story_interval_handle;
         var stories_data = [{
                 title: 'الصحافة',
                 background: './images/1.jpg',
@@ -114,6 +120,13 @@ $data = [
                 items: [{
                         item_type: 'photo',
                         item_src: './images/1.jpg',
+                        item_title: 'هل تحوّل غوغل الكتب الورقية إلى “كتب صوتية”؟',
+                        item_date: '6 - ديسمبر - 2020 3:35 مساءً',
+                        item_link: '#',
+                    },
+                    {
+                        item_type: 'video',
+                        item_src: 'https://sawt.motif.net/wp-content/uploads/2020/12/2.mp4',
                         item_title: 'هل تحوّل غوغل الكتب الورقية إلى “كتب صوتية”؟',
                         item_date: '6 - ديسمبر - 2020 3:35 مساءً',
                         item_link: '#',
@@ -138,15 +151,13 @@ $data = [
                 title: 'أخبار العالم',
                 background: './images/2.jpg',
                 image: './images/opinion-1.jpg',
-                items: [
-                    {
+                items: [{
                     item_type: 'photo',
                     item_src: './images/2.jpg',
                     item_title: 'هل تحوّل غوغل الكتب الورقية إلى “كتب صوتية”؟2',
                     item_date: '6 - ديسمبر - 2020 3:35 مساءً',
                     item_link: '#',
-                    }
-                ],
+                }],
             },
             {
                 title: 'كورونا',
@@ -187,59 +198,123 @@ $data = [
         ];
         $(document).ready(function() {
 
+            // on click story
             jQuery('.story').click(function() {
                 var story_index = jQuery(this).data('story-index');
                 var story = stories_data[story_index];
                 view_story(story_index);
-                view_story_item(story_index, 0);
+                //view_story_item(story_index, 0);
                 jQuery('#story-items').slideDown(100);
             });
 
+            // on click close (x) button
             jQuery('.close-story-items').click(function() {
-                jQuery('#story-items').slideUp(100);
+                storyClose();
             });
+
+            // on click next story
             jQuery('.story-next').click(function() {
-                var current_index = parseInt(jQuery(this).attr('current-index'));
-                var story_index =  parseInt(jQuery(this).attr('story-index'));
-                var story = stories_data[story_index];
-                current_index++;
-                if (story.items.length <= current_index){
-                    view_story(story_index + 1);
-                } else {
-                    view_story_item(story_index, current_index);
-                }
+                go_to_next_item();
             });
+
+            // on click previous story
             jQuery('.story-prev').click(function() {
-                var current_index = parseInt(jQuery(this).attr('current-index'));
-                var story_index =  parseInt(jQuery(this).attr('story-index'));
-                if (current_index != 0){
-                    view_story_item(story_index, current_index - 1)
-                } else if (story_index != 0) {
-                    view_story(story_index - 1);
-                }
+                go_to_prev_item();
             });
         });
-        function view_story(story_index){
+
+        function view_story(story_index) {
             var story = stories_data[story_index];
             jQuery('.story-timeline').html('');
-            for(i=0; i < story.items.length; i++){
-                jQuery('.story-timeline').append("<span index=" + i + "></span>");
+            for (i = 0; i < story.items.length; i++) {
+                jQuery('.story-timeline').append(`
+                <span class="story-timeline-progress" index="` + i + `"><span class="story-timeline-progress-bar"></span></span>
+                `);
             }
             jQuery('.story-info-title').text(story.title);
             jQuery('.story-info-image').attr('src', story.image);
             view_story_item(story_index, 0);
+
         }
+
         function view_story_item(story_index, item_index) {
+            clearTimeout(story_timer_handle);
+            clearInterval(story_interval_handle);
             var story = stories_data[story_index];
-            jQuery('.story-item-background').css('background-image', 'url(' + story.items[item_index].item_src + ')');
-            jQuery('.story-item-title').text(story.items[item_index].item_title);
-            jQuery('.story-item-more-link a').attr('href', story.items[item_index].item_link);
+            var item = story.items[item_index];
+            if (item.item_type == 'video') {
+                jQuery('.story-video-container').show();
+                jQuery('.story-video-container').html(`
+                <video width="320" id="story-item-video" height="240" autoplay>
+                        <source src="https://sawt.motif.net/wp-content/uploads/2020/12/2.mp4" type="video/mp4">
+                </video>`);
+            } else {
+                jQuery('.story-video-container').html('');
+                jQuery('.story-video-container').hide();
+            }
+            jQuery('.story-item-background').css('background-image', 'url(' + item.item_src + ')');
+            jQuery('.story-item-title').text(item.item_title);
+            jQuery('.story-item-more-link a').attr('href', item.item_link);
             jQuery('.story-timeline span').removeClass('active');
-            jQuery('.story-timeline span[index='+ item_index +']').addClass('active');
+            jQuery('.story-timeline span[index=' + item_index + ']').addClass('active');
             jQuery('.story-prev').attr('story-index', story_index);
             jQuery('.story-next').attr('story-index', story_index);
             jQuery('.story-prev').attr('current-index', item_index);
             jQuery('.story-next').attr('current-index', item_index);
+            storyTimerProgress();
+
+        }
+
+        function go_to_next_item() {
+            var current_index = parseInt(jQuery('.story-next').attr('current-index'));
+            var story_index = parseInt(jQuery('.story-next').attr('story-index'));
+            var story = stories_data[story_index];
+            jQuery('.story-timeline-progress[index=' + current_index + '] .story-timeline-progress-bar').css('width', '100%');
+            current_index++;
+            if ((story_index + 1) >= stories_data.length) {
+                storyClose();
+            } else if (story.items.length <= current_index) {
+                view_story(story_index + 1);
+            } else {
+                view_story_item(story_index, current_index);
+            }
+        }
+
+        function go_to_prev_item() {
+            var current_index = parseInt(jQuery('.story-prev').attr('current-index'));
+            var story_index = parseInt(jQuery('.story-prev').attr('story-index'));
+            jQuery('.story-timeline-progress[index=' + current_index + '] .story-timeline-progress-bar').css('width', '0%');
+            if (current_index != 0) {
+                view_story_item(story_index, current_index - 1)
+            } else if (story_index != 0) {
+                view_story(story_index - 1);
+            }
+        }
+
+        function storyTimerProgress() {
+            start_time_ms = (new Date()).getTime();
+            story_interval_handle = setInterval(
+                function() {
+                    jQuery('.story-timeline-progress.active .story-timeline-progress-bar').css('width', getRemainingTime() + '%');
+                }, 10);
+            story_timer_handle = setTimeout(function() {
+                go_to_next_item();
+            }, story_timer_step);
+        }
+
+        function getRemainingTime() {
+            var result = story_timer_step - ((new Date()).getTime() - start_time_ms);
+
+            result = (story_timer_step - result) / story_timer_step * 100;
+            return Math.floor(result);;
+        }
+
+        function storyClose() {
+
+            clearTimeout(story_timer_handle);
+            clearInterval(story_interval_handle);
+            jQuery('#story-items').slideUp(100);
+            jQuery('.story-video-container').html('');
         }
     </script>
 </body>
