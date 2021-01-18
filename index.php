@@ -92,18 +92,10 @@ $data = [
                             <div class="story-info-title"></div>
                             <div class="story-control">
                                 <div class="story-pause">
-                                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="16" cy="16" r="15.5" fill="white" fill-opacity="0.2" stroke="white" />
-                                        <path d="M18.6694 10.0146C17.9437 10.0146 17.3555 10.6029 17.3555 11.3286V20.672C17.3555 21.3976 17.9437 21.9859 18.6694 21.9859C19.395 21.9859 19.9833 21.3976 19.9833 20.672V11.3286C19.9833 10.6029 19.3951 10.0146 18.6694 10.0146Z" fill="white" />
-                                        <path d="M13.3305 10.0146C12.6049 10.0146 12.0166 10.6029 12.0166 11.3286V20.672C12.0166 21.3976 12.6049 21.9859 13.3305 21.9859C14.0562 21.9859 14.6444 21.3976 14.6444 20.672V11.3286C14.6444 10.6029 14.0562 10.0146 13.3305 10.0146Z" fill="white" />
-                                    </svg>
+                                    <img src="./images/pause.svg">
                                 </div>
                                 <div class="story-mute">
-                                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="16" cy="16" r="15.5" fill="white" fill-opacity="0.2" stroke="white"/>
-                                        <path d="M19.9989 9.50225C19.9989 9.31228 19.8889 9.13231 19.7189 9.05232C19.539 8.96234 19.339 8.99233 19.189 9.11231L14.7598 12.6417L19.9989 17.8808V9.50225Z" fill="white"/>
-                                        <path d="M22.8524 22.1451L9.85457 9.1472C9.6596 8.95223 9.34266 8.95223 9.14769 9.1472C8.95272 9.34217 8.95272 9.65912 9.14769 9.85409L12.2932 13.0006H12.0002C11.6903 13.0006 11.4203 13.1405 11.2403 13.3605C11.0904 13.5305 11.0004 13.7604 11.0004 14.0004V17.9997C11.0004 18.5497 11.4503 18.9996 12.0002 18.9996H14.3198L19.189 22.8889C19.279 22.9589 19.389 22.9989 19.499 22.9989C19.5689 22.9989 19.6489 22.9789 19.7189 22.9489C19.8889 22.8689 19.9989 22.689 19.9989 22.499V20.7063L22.1445 22.8519C22.2425 22.9499 22.3705 22.9989 22.4985 22.9989C22.6264 22.9989 22.7544 22.9499 22.8524 22.8529C23.0474 22.657 23.0474 22.341 22.8524 22.1451Z" fill="white"/>
-                                    </svg>
+                                    <img src="./images/mute.svg">
                                 </div>
                             </div>
                         </div>
@@ -126,17 +118,18 @@ $data = [
     </div>
     <script>
         var start_time_ms = 0;
-        var story_timer_step = 3000;
-        var story_timer_handle;
+        var story_timer_step = null;
+        // var story_timer_handle;
         var story_interval_handle;
         var story_is_paused = false;
+        var story_is_muted = true;
         var stories_data = [{
                 title: 'الصحافة',
                 background: './images/1.jpg',
                 image: './images/opinion-1.jpg',
                 items: [{
                         item_type: 'photo',
-                        item_src: './images/1.jpg',
+                        item_src: './images/full.jpg',
                         item_title: 'هل تحوّل غوغل الكتب الورقية إلى “كتب صوتية”؟',
                         item_date: '6 - ديسمبر - 2020 3:35 مساءً',
                         item_link: '#',
@@ -239,9 +232,20 @@ $data = [
                 go_to_prev_item();
             });
 
-
             jQuery('.story-pause').click(function() {
-                story_pause();
+                if (story_is_paused == false) {
+                    storyPause();
+                } else {
+                    storyResume();
+                }
+            });
+
+            jQuery('.story-mute').click(function() {
+                if (story_is_muted == false) {
+                    storyMute();
+                } else {
+                    storyUnmute();
+                }
             });
         });
 
@@ -260,14 +264,15 @@ $data = [
         }
 
         async function view_story_item(story_index, item_index) {
-            clearTimeout(story_timer_handle);
+            // clearTimeout(story_timer_handle);
             clearInterval(story_interval_handle);
             var story = stories_data[story_index];
             var item = story.items[item_index];
             if (item.item_type == 'video') {
+                var muted = story_is_muted ? 'muted' : '';
                 jQuery('.story-video-container').show();
                 jQuery('.story-video-container').html(`
-                <video width="320" id="story-item-video" height="240" autoplay>
+                <video width="320" ` + muted + ` id="story-item-video" height="240" autoplay>
                         <source src="` + item.item_src + `" type="video/mp4">
                 </video>`);
             } else {
@@ -315,28 +320,31 @@ $data = [
         }
 
         function storyTimerProgress() {
-            start_time_ms = (new Date()).getTime();
+            start_time_ms = 0;
             story_interval_handle = setInterval(
                 function() {
-                    if (!story_is_paused) {
+                    if (story_is_paused == false) {
                         jQuery('.story-timeline-progress.active .story-timeline-progress-bar').css('width', getRemainingTime() + '%');
                     }
                 }, 10);
-            story_timer_handle = setTimeout(function() {
-                go_to_next_item();
-            }, story_timer_step);
+            // story_timer_handle = setTimeout(function() {
+
+            // }, story_timer_step);
         }
 
         function getRemainingTime() {
-            var result = story_timer_step - ((new Date()).getTime() - start_time_ms);
-
-            result = (story_timer_step - result) / story_timer_step * 100;
-            return Math.floor(result);;
+            var result = (100 / story_timer_step) * 10;
+            start_time_ms = start_time_ms + result;
+            if (start_time_ms >= 100) {
+                go_to_next_item();
+            }
+            //result = (story_timer_step - result) / story_timer_step * 100;
+            return Math.floor(start_time_ms);;
         }
 
         function storyClose() {
 
-            clearTimeout(story_timer_handle);
+            //clearTimeout(story_timer_handle);
             clearInterval(story_interval_handle);
             jQuery('#story-items').slideUp(100);
             jQuery('.story-video-container').html('');
@@ -354,17 +362,50 @@ $data = [
                         resolve();
                     });
                 } else {
-                    story_timer_step = 3000;
+                    story_timer_step = 30000;
                     resolve();
                 }
 
             });
         }
 
-        function story_pause(){
+        function storyPause() {
             story_is_paused = true;
+            var vid = document.getElementById("story-item-video");
+            if (vid) {
+                vid.pause();
+            }
+            jQuery('.story-pause img').attr('src', './images/play.svg');
+
         }
-        
+
+        function storyResume() {
+            story_is_paused = false;
+            var vid = document.getElementById("story-item-video");
+            if (vid) {
+                vid.play();
+            };
+            jQuery('.story-pause img').attr('src', './images/pause.svg');
+        }
+
+        function storyMute() {
+            story_is_muted = true;
+            var vid = document.getElementById("story-item-video");
+            if (vid) {
+                vid.muted = true;
+            }
+            jQuery('.story-mute img').attr('src', './images/mute.svg');
+
+        }
+
+        function storyUnmute() {
+            story_is_muted = false;
+            var vid = document.getElementById("story-item-video");
+            if (vid) {
+                vid.muted = false;
+            };
+            jQuery('.story-mute img').attr('src', './images/sound.svg');
+        }
     </script>
 </body>
 
