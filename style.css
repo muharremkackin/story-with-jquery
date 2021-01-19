@@ -2,16 +2,11 @@
 #stories{
     margin-top: 50px;
 }
-.stories-container{
+.stories-container {
     display: flex;
+    flex-wrap: wrap;
 }
-.story-col {
-    flex: 1;
-    margin-left: 15px;
-}
-.story-col:last-child{
-    margin-left: 0px;
-}
+
 .story {
     border-radius: 16px;
     height: 252px;
@@ -46,6 +41,7 @@
 #story-items{
     display: none;
     position: fixed;
+    right: 0;
     top: 0;
     height: 100%;
     background: rgb(0 0 0 / 0.85);
@@ -58,7 +54,7 @@
     height: 100%;
 }
 .story-item {
-    margin: 60px 0;
+    margin: 0px 0;
     display: flex;
     width: 100%;
     justify-content: center;

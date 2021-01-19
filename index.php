@@ -50,7 +50,7 @@ $data = [
                         <?php
                         foreach ($data as $key => $story) {
                         ?>
-                            <div class="story-col">
+                            <div class="col">
                                 <div class="story" data-story-index="<?= $key; ?>" style="background-image:url('./images/<?= $key + 1; ?>.jpg')">
                                     <div class="story-borderd">
                                         <img class="story-image" src="<?= $story['image']; ?>">
