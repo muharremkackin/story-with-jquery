@@ -247,8 +247,16 @@ $data = [
                     storyUnmute();
                 }
             });
+            set_story_width();
+            jQuery(window).on('resize', function(){
+                set_story_width();
+            });
         });
-
+        function set_story_width(){
+            var window_height = jQuery(window).height();
+            var sotry_ratio = (384 / 778) * (window_height);
+            jQuery('.story-item-background').css({'flex':'0 0' + sotry_ratio + 'px','width':sotry_ratio + 'px'})
+        }
         function view_story(story_index) {
             var story = stories_data[story_index];
             jQuery('.story-timeline').html('');
@@ -362,7 +370,7 @@ $data = [
                         resolve();
                     });
                 } else {
-                    story_timer_step = 30000;
+                    story_timer_step = 3000;
                     resolve();
                 }
 

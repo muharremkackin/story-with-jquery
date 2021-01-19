@@ -99,8 +99,10 @@
     line-height: 20px;
 }
 .story-info {
+    background: linear-gradient(360deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 100%);
     display: flex;
-    margin: 16px;
+    padding: 26px 16px 0px;
+    margin-top: -10px;
 }
 .story-info-image{
     border: 2px solid #FFFFFF;
@@ -137,7 +139,7 @@
 .story-timeline {
     display: flex;
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 .story-timeline .story-timeline-progress {
     background: #696969;
