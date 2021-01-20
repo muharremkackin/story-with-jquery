@@ -335,9 +335,6 @@ $data = [
                         jQuery('.story-timeline-progress.active .story-timeline-progress-bar').css('width', getRemainingTime() + '%');
                     }
                 }, 10);
-            // story_timer_handle = setTimeout(function() {
-
-            // }, story_timer_step);
         }
 
         function getRemainingTime() {
@@ -346,7 +343,6 @@ $data = [
             if (start_time_ms >= 100) {
                 go_to_next_item();
             }
-            //result = (story_timer_step - result) / story_timer_step * 100;
             return Math.floor(start_time_ms);;
         }
 
